@@ -35,4 +35,18 @@ class Dom {
 
         return element;
     }
+
+    /**
+     * Force a className on an element or remove it.
+     * @param {HTMLElement} element 
+     * @param {string[]} classNames 
+     * @param {boolean} isPresent
+     */
+    forceClass(element, classNames, isPresent) {
+        if (isPresent) {
+            classNames.forEach((className) => element.classList.add(className));
+        } else {
+            classNames.forEach((className) => element.classList.remove(className));
+        }
+    }
 }

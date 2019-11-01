@@ -1,29 +1,5 @@
 body {
-    position: relative;
-    margin: 0;
-    padding: 0
 }
 
 .workspace {
-    position: fixed;
-    margin: 0;
-    padding: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /*
-    background: #ffc0cb;
-    */
 }
-
-/*
-.choice {
-    opacity: 0.8;
-}
-
-.choice.selected {
-    opacity: 1;
-}
-*/
-

@@ -21,28 +21,32 @@ class Ui {
     draw() {
         const workspace = this._body.getElementsByClassName('workspace')[0];
 
-        workspace.classList.add('ui');
-        workspace.classList.add('container');
+        this._dom.forceClass(workspace, ['ui', 'container'], true);
 
         this._createTitle(workspace, 'Word Generator');
 
-        const controlPanel = this._controlPanel = this._createPanel(workspace, ['ui', 'form', 'segment', 'controlPanel']);
-
+        const controlPanel = this._createPanel(workspace, ['ui', 'form', 'segment', 'controlPanel']);
         this._createButton(workspace, 'Generate', () => this.run(), ['run']);
+        const resultPanel = this._createPanel(workspace, ['ui', 'segment', 'resultPanel']);
 
-        this._resultPanel = this._createPanel(workspace, ['ui', 'segment', 'resultPanel']);
+        const dataNamePanel = this._createPanel(controlPanel, ['field', 'dataNamePanel']);
+        
+        const prefixSizeCountPanel = this._createPanel(controlPanel, ['two', 'fields', 'prefixSizeCountPanel']);
+        const prefixSizePanel = this._createPanel(prefixSizeCountPanel, ['field', 'prefixSizePanel']);
+        const countPanel = this._createPanel(prefixSizeCountPanel, ['field', 'countPanel']);
 
-        const dataNamePanel = this._dataNamePanel = this._createPanel(controlPanel, ['field', 'dataNamePanel']);
+        const minMaxWordPanel = this._createPanel(controlPanel, ['two', 'fields', 'minMaxWordPanel']);
+        const minWordPanel = this._createPanel(minMaxWordPanel, ['field', 'minWordPanel']);
+        const maxWordPanel = this._createPanel(minMaxWordPanel, ['field', 'maxWordPanel']);
 
-        const prefixSizePanel = this._prefixSizePanel = this._createPanel(controlPanel, ['field', 'prefixSizePanel']);
+        const resultDimmerLoader = this._resultDimmerLoader = this._createPanel(resultPanel, ['ui', 'dimmer']);
+        this._resultLoader = this._createPanel(resultDimmerLoader, ['ui', 'loader']);
 
-        const minMaxWordPanel = this._minMaxWordPanel = this._createPanel(controlPanel, ['two', 'fields', 'minMaxWordPanel']);
-
-        const minWordPanel = this._minWordPanel = this._createPanel(minMaxWordPanel, ['field', 'minWordPanel']);
-        const maxWordPanel = this._maxWordPanel = this._createPanel(minMaxWordPanel, ['field', 'maxWordPanel']);
+        this._results = this._createPanel(resultPanel, ['results']);
 
         this._createLabel(dataNamePanel, 'Data Source', ['dataName']);
         this._createLabel(prefixSizePanel, 'Prefix\'s length', ['prefixLen']);
+        this._createLabel(countPanel, 'Result count', ['count']);
         this._createLabel(minWordPanel, 'Minimum word size', ['minSize']);
         this._createLabel(maxWordPanel, 'Maximum word size', ['maxSize']);
 
@@ -51,6 +55,31 @@ class Ui {
          * @type {Object.<string, HTMLElement>}
          */
         this._dataNames = {};
+
+        /**
+         * @type {Object.<number, HTMLElement>}
+         */
+        this._prefixLens = {};
+        const prefixLen = [2, 3, 4, 5, 6];
+
+        /**
+         * @type {Object.<number, HTMLElement>}
+         */
+        this._counts = {};
+        const counts = [2, 5, 10, 15, 20];
+
+        /**
+         * @type {Object.<number, HTMLElement>}
+         */
+        this._minSizes = {};
+        const minSizes = [5, 6, 7, 8, 20, 30];
+
+        /**
+         * @type {Object.<number, HTMLElement>}
+         */
+        this._maxSizes = {};
+        const maxSizes = [10, 12, 14, 16, 18, 20, 45, 85];
+
         this._createButtons(
             dataNamePanel,
             this._dataNames,
@@ -60,11 +89,6 @@ class Ui {
             ['dataName']
         );
 
-        /**
-         * @type {Object.<number, HTMLElement>}
-         */
-        this._prefixLens = {};
-        const prefixLen = [2, 3, 4, 5, 6];
         this._createButtons(
             prefixSizePanel,
             this._prefixLens,
@@ -74,11 +98,15 @@ class Ui {
             ['prefixLen']
         );
 
-        /**
-         * @type {Object.<number, HTMLElement>}
-         */
-        this._minSizes = {};
-        const minSizes = [5, 6, 7, 8, 20, 30];
+        this._createButtons(
+            countPanel,
+            this._counts,
+            counts,
+            (count) => `${count}`,
+            (count) => this.onCountClicked(count),
+            ['count']
+        );
+
         this._createButtons(
             minWordPanel,
             this._minSizes,
@@ -88,11 +116,6 @@ class Ui {
             ['minSize']
         );
 
-        /**
-         * @type {Object.<number, HTMLElement>}
-         */
-        this._maxSizes = {};
-        const maxSizes = [10, 12, 14, 16, 18, 20, 45, 85];
         this._createButtons(
             maxWordPanel,
             this._maxSizes,
@@ -105,8 +128,24 @@ class Ui {
         this._state.onControlDataChanged.add(({ state, changed }) => this.onControlDataChanged(state, changed), { state: this._state });
         this._state.onResultAdded.add(({ state, result }) => this.onResultAdded(state, result));
         this._state.onResultCleaned.add(({ state }) => this.onResultCleaned(state));
+
+        window.addEventListener('hashchange', () => this.updateHashState(), false);
+        this._state.onHashChanged.add(() => this.updateHashLocation());
+        this.updateHashState();
     }
 
+    updateHashState() {
+        this._state.hash = window.location.hash;
+        if (window.location.hash !== this._state.hash) {
+            window.location.hash = this._state.hash;
+        }
+    }
+
+    updateHashLocation() {
+        if (window.location.hash !== this._state.hash) {
+            window.location.hash = this._state.hash;
+        }
+    }
 
     /**
      * 
@@ -166,7 +205,6 @@ class Ui {
             parent,
             classes: ['ui', 'header', ...classes]
         });
-
     }
 
 
@@ -189,22 +227,31 @@ class Ui {
 
     /**
      * @param {string} dataName
+     * @returns {void}
      */
     onDataNameClicked(dataName) {
-        console.log(`onDataNameClicked: [${dataName}]`);
         this._state.dataName = dataName;
     }
 
     /**
      * @param {number} prefixLen
+     * @returns {void}
      */
     onPrefixLenClicked(prefixLen) {
-        console.log(`onPrefixLenClicked: [${prefixLen}]`);
         this._state.prefixLen = prefixLen;
     }
 
     /**
+     * @param {number} prefixLen
+     * @returns {void}
+     */
+    onCountClicked(count) {
+        this._state.count = count;
+    }
+
+    /**
      * @param {number} minSize
+     * @returns {void}
      */
     onMinSizeClicked(minSize) {
         this._state.minSize = minSize;
@@ -212,9 +259,27 @@ class Ui {
 
     /**
      * @param {number} maxSize
+     * @returns {void}
      */
     onMaxSizeClicked(maxSize) {
         this._state.maxSize = maxSize;
+    }
+
+    /**
+     * 
+     * @param {Object.<T, HTMLElement>} htmlElements 
+     * @param {boolean} all 
+     * @param {string[]} changed 
+     * @param {string} propertyName
+     * @template T
+     */
+    _updateButtonsForProperty(htmlElements, all, changed, propertyName) {
+        if (all || changed.includes(propertyName)) {
+            const propertyValue = `${state[propertyName]}`;
+            Object.keys(htmlElements).forEach((key) => {
+                this._dom.forceClass(htmlElements[key], ['active'], key === propertyValue);
+            });
+        }
     }
 
     /**
@@ -223,46 +288,11 @@ class Ui {
      */
     onControlDataChanged(state, changed) {
         const all = changed === undefined;
-        console.log(`data changed : ${all ? ' (all)' : changed.join(', ')}`);
-        if (all || changed.includes('dataName')) {
-            Object.keys(this._dataNames).forEach((dataName) => {
-                if (dataName === state.dataName) {
-                    this._dataNames[dataName].classList.add('active');
-                } else {
-                    this._dataNames[dataName].classList.remove('active');
-                }
-            });
-        }
-        if (all || changed.includes('prefixLen')) {
-            const prefixLenStrState = `${state.prefixLen}`;
-            Object.keys(this._prefixLens).forEach((prefixLenStr) => {
-                if (prefixLenStr === prefixLenStrState) {
-                    this._prefixLens[prefixLenStr].classList.add('active');
-                } else {
-                    this._prefixLens[prefixLenStr].classList.remove('active');
-                }
-            });
-        }
-        if (all || changed.includes('minSize')) {
-            const minSizeStrState = `${state.minSize}`;
-            Object.keys(this._minSizes).forEach((minSizeStr) => {
-                if (minSizeStr === minSizeStrState) {
-                    this._minSizes[minSizeStr].classList.add('active');
-                } else {
-                    this._minSizes[minSizeStr].classList.remove('active');
-                }
-            });
-        }
-        if (all || changed.includes('maxSize')) {
-            const maxSizeStrState = `${state.maxSize}`;
-            Object.keys(this._maxSizes).forEach((maxSizeStr) => {
-                if (maxSizeStr === maxSizeStrState) {
-                    this._maxSizes[maxSizeStr].classList.add('active');
-                } else {
-                    this._maxSizes[maxSizeStr].classList.remove('active');
-                }
-            });
-        }
+        this._updateButtonsForProperty(this._dataNames, all, changed, 'dataName');
+        this._updateButtonsForProperty(this._prefixLens, all, changed, 'prefixLen');
+        this._updateButtonsForProperty(this._counts, all, changed, 'count');
+        this._updateButtonsForProperty(this._minSizes, all, changed, 'minSize');
+        this._updateButtonsForProperty(this._maxSizes, all, changed, 'maxSize');
     }
 
     /**
@@ -276,15 +306,17 @@ class Ui {
             name: 'p',
             classes: ['ui', 'item'],
             text: result,
-            parent: this._resultPanel,
+            parent: this._results,
         });
+        this._dom.forceClass(this._resultDimmerLoader, ['active'], false);
     }
 
     /**
      * @returns {void}
      */
     onResultCleaned() {
-        this._resultPanel.innerHTML = '';
+        this._results.innerHTML = '';
+        this._dom.forceClass(this._resultDimmerLoader, ['active'], true);
     }
 
     run() {
