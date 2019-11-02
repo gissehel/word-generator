@@ -227,27 +227,15 @@ class WordStat {
      */
     pick(sub_struct) {
         let index = this._random.randint(0, sub_struct.total-1);
+        /** @type {string} */
         let result = null;
         let data_index = 0;
-        // console.log('sub_struct', sub_struct);
-        // console.log('sub_struct.total', sub_struct.total);
-        // console.log('index', index);
-        // console.log('this._random.randint', this._random.randint);
         let [letter, freq] = sub_struct.data[data_index];
         result = letter;
-        // console.log('[letter, freq]', [letter, freq]);
         while (index >= freq) {
-            // if (freq === undefined) {
-            //     console.log('sub_struct', sub_struct);
-            //     console.log('index', index);
-            //     console.log('data_index', data_index);
-            //     console.log('sub_struct.total', sub_struct.total);
-            // }
-            // console.log('index', index);
             index -= freq;
 
             data_index += 1;
-            // console.log('data_index', data_index);
             letter = sub_struct.data[data_index][0];
             freq = sub_struct.data[data_index][1];
             result = letter;
