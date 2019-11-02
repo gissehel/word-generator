@@ -245,12 +245,12 @@ class Ui {
     }
 
     /**
-     * 
+     * @param {State} state
      * @param {boolean} all 
      * @param {string[]} changed 
      * @param {string} propertyName
      */
-    _updateButtonsForProperty(all, changed, propertyName) {
+    _updateButtonsForProperty(state, all, changed, propertyName) {
         const htmlElements = this._buttonElementsByTypeByValue[propertyName];
         if (all || changed.includes(propertyName)) {
             const propertyValue = `${state[propertyName]}`;
@@ -266,11 +266,11 @@ class Ui {
      */
     onControlDataChanged(state, changed) {
         const all = changed === undefined;
-        this._updateButtonsForProperty(all, changed, 'dataName');
-        this._updateButtonsForProperty(all, changed, 'prefixLen');
-        this._updateButtonsForProperty(all, changed, 'count');
-        this._updateButtonsForProperty(all, changed, 'minSize');
-        this._updateButtonsForProperty(all, changed, 'maxSize');
+        this._updateButtonsForProperty(state, all, changed, 'dataName');
+        this._updateButtonsForProperty(state, all, changed, 'prefixLen');
+        this._updateButtonsForProperty(state, all, changed, 'count');
+        this._updateButtonsForProperty(state, all, changed, 'minSize');
+        this._updateButtonsForProperty(state, all, changed, 'maxSize');
     }
 
     /**
