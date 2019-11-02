@@ -26,7 +26,7 @@ class Ui {
         this._createTitle(workspace, 'Word Generator');
 
         const controlPanel = this._createPanel(workspace, ['ui', 'form', 'segment', 'controlPanel']);
-        this._createButton(workspace, 'Generate', () => this.run(), ['run']);
+        this._createButton(workspace, 'Generate', () => this.run(), ['run', 'primary']);
         const resultPanel = this._createPanel(workspace, ['ui', 'segment', 'resultPanel']);
 
         const dataNamePanel = this._createPanel(controlPanel, ['field', 'dataNamePanel']);
@@ -132,7 +132,7 @@ class Ui {
      * @param {string[]} classes 
      * @template T
      */
-    _createButtons(parent, buttonType, elementRefs, getName, onClick, classes=null) {
+    _createButtons(parent, buttonType, elementRefs, getName, onClick, classes = null) {
         classes = classes || [];
         classes.push(buttonType);
 
@@ -258,7 +258,7 @@ class Ui {
         if (all || changed.includes(propertyName)) {
             const propertyValue = `${state[propertyName]}`;
             Object.keys(htmlElements).forEach((key) => {
-                this._dom.forceClass(htmlElements[key], ['active'], key === propertyValue);
+                this._dom.forceClass(htmlElements[key], ['active', 'secondary'], key === propertyValue);
             });
         }
     }
