@@ -82,6 +82,9 @@ class State {
     }
     set hash(value) {
         this._hashUpdate = true;
+        if (value.startsWith('#')) {
+            value = value.substring(1);
+        }
         value.split('|').filter((part) => part.includes('=')).forEach((part) => {
             const partParts = part.split('=');
             if (partParts.length === 2 && stateProps.includes(partParts[0])) {
