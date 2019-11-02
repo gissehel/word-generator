@@ -42,7 +42,11 @@ class Ev {
      * @returns {void}
      */
     remove(callback) {
-        this._callbacks.find()
+        let index = this._callbacks.indexOf(callback);
+        while (index >= 0) {
+            this._callbacks.splice(index, index);
+            index = this._callbacks.indexOf(callback);
+        }
     }
 
     /**
