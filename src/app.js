@@ -43,5 +43,6 @@ class App {
 
     start() {
         this._ui.draw();
+        this._controller.run();
     }
 }
