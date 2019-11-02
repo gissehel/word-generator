@@ -19,9 +19,7 @@ class Ui {
      * Draw in the dom
      */
     draw() {
-        const workspace = this._body.getElementsByClassName('workspace')[0];
-
-        this._dom.forceClass(workspace, ['ui', 'container'], true);
+        const workspace = this._createPanel(this._body, ['ui', 'container', 'workspace']);
 
         this._createTitle(workspace, 'Word Generator');
 
@@ -104,21 +102,20 @@ class Ui {
         this._state.onResultAdded.add(({ state, result }) => this.onResultAdded(state, result));
         this._state.onResultCleaned.add(({ state }) => this.onResultCleaned(state));
 
-        window.addEventListener('hashchange', () => this.updateHashState(), false);
         this._state.onHashChanged.add(() => this.updateHashLocation());
-        this.updateHashState();
+        this._dom.onHashChanged.add(() => this.updateHashState(), { hash: this._dom.hash });
     }
 
     updateHashState() {
-        this._state.hash = window.location.hash;
-        if (window.location.hash !== this._state.hash) {
-            window.location.hash = this._state.hash;
+        this._state.hash = this._dom.hash;
+        if (this._dom.hash !== this._state.hash) {
+            this._dom.hash = this._state.hash;
         }
     }
 
     updateHashLocation() {
-        if (window.location.hash !== this._state.hash) {
-            window.location.hash = this._state.hash;
+        if (this._dom.hash !== this._state.hash) {
+            this._dom.hash = this._state.hash;
         }
     }
 
@@ -296,7 +293,7 @@ class Ui {
      * @returns {void}
      */
     onResultCleaned() {
-        this._results.innerHTML = '';
+        this._dom.empty(this._results);
         this._dom.forceClass(this._resultDimmerLoader, ['active'], true);
     }
 

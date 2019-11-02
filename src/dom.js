@@ -49,4 +49,36 @@ class Dom {
             classNames.forEach((className) => element.classList.remove(className));
         }
     }
+
+    /**
+     * Remove everything inside an HTMLElement
+     * @param {HTMLElement} element 
+     */
+    empty(element) {
+        element.innerHTML = '';
+    }
+
+    /**
+     * The current hash
+     * @returns {string}
+     */
+    get hash() {
+        return window.location.hash;
+    }
+
+    set hash(value) {
+        window.location.hash = value;
+    }
+
+    /**
+     * @returns {Ev<{hash:string}>}
+     */
+    get onHashChanged() {
+        if (this._onHashChanged === undefined) {
+            this._onHashChanged = new Ev();
+            window.addEventListener('hashchange', () => this._onHashChanged.execute({ hash: this.hash }), false);
+        }
+        return this._onHashChanged;
+    }
+
 }
